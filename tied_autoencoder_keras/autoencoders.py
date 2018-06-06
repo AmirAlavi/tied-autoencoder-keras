@@ -33,6 +33,13 @@ class DenseLayerAutoencoder(Dense):
             reconstruction = self.activation(reconstruction)
         return reconstruction
 
+    def encode(self, inputs):
+        latent = K.dot(inputs, self.kernel)
+        if self.use_bias:
+            latent = K.bias_add(latent, self.bias)
+        if self.activation is not None:
+            latent = self.activation(latent)
+        return latent
 
 class SparseLayerAutoencoder(Sparse):
     def compute_output_shape(self, input_shape):
@@ -68,3 +75,12 @@ class SparseLayerAutoencoder(Sparse):
         if self.activation is not None:
             reconstruction = self.activation(reconstruction)
         return reconstruction
+
+    def encode(self, inputs):
+        latent = self.kernel * self.adjacency_tensor
+        latent = K.dot(inputs, latent)
+        if self.use_bias:
+            latent = K.bias_add(latent, self.bias)
+        if self.activation is not None:
+            latent = self.activation(latent)
+        return latent
