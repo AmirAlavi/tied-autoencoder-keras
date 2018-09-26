@@ -1,15 +1,19 @@
 from keras import backend as K
 from keras.engine import InputSpec
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 from sparsely_connected_keras import Sparse
+from keras.engine.topology import Layer
 
 
 class DenseLayerAutoencoder(Dense):
-    def __init__(self, layer_sizes, *args, **kwargs):
+    def __init__(self, layer_sizes, l2_normalize=False, dropout=0.0, *args, **kwargs):
         self.layer_sizes = layer_sizes
+        self.l2_normalize = l2_normalize
+        self.dropout = dropout
         self.kernels = []
         self.biases = []
         self.biases2 = []
+        self.uses_learning_phase = True
         super().__init__(units=1, *args, **kwargs)  # 'units' not used
 
     def compute_output_shape(self, input_shape):
@@ -69,19 +73,29 @@ class DenseLayerAutoencoder(Dense):
     def call(self, inputs):
         return self.decode(self.encode(inputs))
 
+    def _apply_dropout(self, inputs):
+        dropped =  K.dropout(inputs, self.dropout)
+        return K.in_train_phase(dropped, inputs)
+
     def encode(self, inputs):
         latent = inputs
         for i in range(len(self.layer_sizes)):
+            if self.dropout > 0:
+                latent = self._apply_dropout(latent)
             latent = K.dot(latent, self.kernels[i])
             if self.use_bias:
                 latent = K.bias_add(latent, self.biases[i])
             if self.activation is not None:
                 latent = self.activation(latent)
+        if self.l2_normalize:
+            latent = latent / K.l2_normalize(latent, axis=-1)
         return latent
 
     def decode(self, latent):
         recon = latent
         for i in range(len(self.layer_sizes)):
+            if self.dropout > 0:
+                recon = self._apply_dropout(recon)
             recon = K.dot(recon, K.transpose(self.kernels[len(self.layer_sizes) - i - 1]))
             if self.use_bias:
                 recon = K.bias_add(recon, self.biases2[i])
