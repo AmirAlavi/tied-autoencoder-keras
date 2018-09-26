@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='tied_autoencoder_keras',
-    version='0.3.0',
+    version='0.4.0',
     description='Autoencoder layers (with tied encode and decode weights) for Keras',
     author='Amir Alavi',
     url='https://github.com/AmirAlavi/tied-autoencoder-keras',
