@@ -1,7 +1,7 @@
 # tied-autoencoder-keras
 Autoencoder layers (with tied encode and decode weights) for Keras
 
-Tutorial: [https://amiralavi.net/blog/2018/08/25/tied-autoencoders](https://amiralavi.net/blog/2018/08/25/tied-autoencoders)
+Tutorial: [https://amiralavi.com/tied-autoencoders/](https://amiralavi.com/tied-autoencoders/)
 
 `DenseLayerAutoencoder` is a derived class of the Keras built-in Dense class.
 
