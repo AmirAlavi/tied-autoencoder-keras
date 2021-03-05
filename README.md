@@ -15,4 +15,4 @@ model = Model(inputs=inputs, outputs=x)
 print(model.summary())
 ```
 
-`DenseLayerAutoencoder` also provides a `encode` and `decode` function (which are both called by the `call` function).
+`DenseLayerAutoencoder` also provides an `encode` and `decode` function (which are both called by the `call` function).
